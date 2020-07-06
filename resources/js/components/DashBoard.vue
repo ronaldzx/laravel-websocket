@@ -44,12 +44,12 @@
             </v-list-item>
           </v-list-group>
           <v-list-item v-else :key="opcion.descripcion" link :to="{name: opcion.route}">
-            <v-list-item-action>
-              <v-icon>{{ opcion.icono }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ opcion.descripcion }}</v-list-item-title>
-            </v-list-item-content>
+              <v-list-item-action>
+                <v-icon>{{ opcion.icono }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>{{ opcion.descripcion }}</v-list-item-title>
+              </v-list-item-content>
           </v-list-item>
         </template>
       </v-list>
@@ -62,7 +62,13 @@
         <img :src="'../images/larco.png'" alt style="width:15%;" />
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu bottom offset-y origin="center center" transition="scale-transition" min-width="300px">
+      <v-menu
+        bottom
+        offset-y
+        origin="center center"
+        transition="scale-transition"
+        min-width="300px"
+      >
         <template v-slot:activator="{on}">
           <v-btn icon @click="messages=0" alt="Log out" v-on="on">
             <v-badge :content="messages" :value="messages" color="green" overlap>
@@ -71,19 +77,15 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item v-for="(item, i) in lista" :key="i">
-            <v-list-item-title>{{ item.direccion }} • {{item.fecha}}</v-list-item-title>
+          <v-list-item class="d-flex justify-space-between" v-for="(item, i) in lista" :key="i">
+            <div class="caption grey--text font-weight-light">{{item.fecha}}</div>
+            <div class="caption grey--text text--darken-1 font-weight-bold">{{item.direccion}}</div>
           </v-list-item>
         </v-list>
       </v-menu>
       <v-btn icon @click="cerrarSesion()" alt="Log out">
         <v-icon>fa-power-off</v-icon>
       </v-btn>
-      <!-- <v-btn icon large>
-        <v-avatar color="indigo">
-      <v-icon dark>mdi-account-circle</v-icon>
-    </v-avatar>
-      </v-btn> -->
     </v-app-bar>
     <v-content>
       <router-view></router-view>
@@ -92,9 +94,14 @@
 </template>
 
 <script>
+import moment from "moment";
 import Echo from "laravel-echo";
+import {Howl, Howler} from 'howler';
 window.Pusher = require("pusher-js");
-export default {
+const sound = new Howl ({
+  src:['../sound/emergency006.wav']
+})
+export default {  
   props: {
     source: String
   },
@@ -126,9 +133,10 @@ export default {
       }
       this.messages++;
       this.lista.push({
-        direccion: e.direccion,
-        fecha: e.fecha
+        direccion: e.incidencia.establecimiento[0]["direccion"],
+        fecha: this.formatDateTime(e.incidencia.incidencia.fecha.date)        
       });
+      sound.play();
     });
     axios
       .get("obtener-menu")
@@ -138,6 +146,9 @@ export default {
       .catch(error => {});
   },
   methods: {
+    formatDateTime(value) {
+      return moment(value).format("DD/MM/YYYY h:mm:ss");
+    },
     resetMenu() {
       this.lista = [];
       this.lista.push({

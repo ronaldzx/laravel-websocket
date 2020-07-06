@@ -10,21 +10,28 @@ class IncidenciaController extends Controller
 {
     //
     public function obtenerIncidencia(){
-        $respuesta = Incidencia::all();
+        $respuesta = Incidencia::ObtenerIncidencias();
         return $respuesta;
     }
 
-    public function insertarIncidencia(Request $request){
+    static function insertarIncidencia($establecimientoId,$fecha){
         $incidencia = new Incidencia();
-        $incidencia->direccion = $request->direccion;
-        $incidencia->fecha = $request->fecha;
-        event (new NewMessage($incidencia));
+        $incidencia->establecimiento_id = $establecimientoId;
+        $incidencia->fecha = $fecha;
+        $notificacion = [
+            'establecimiento'=> EstablecimientoController::buscarEstablecimientoXId($establecimientoId),
+            'incidencia'=> $incidencia
+        ];           
+        $notificacion = collect($notificacion);
+        $notificacion = self::EnviarNotificacion($notificacion);
         return $incidencia->save(); 
     }
     public function editarDescripcion(Request $request){
         $incidencia = Incidencia::find($request->id);
-        $incidencia->descripcion = $request->descripcion;
-        event (new NewMessage($incidencia));
+        $incidencia->descripcion = $request->descripcion;       
         return $incidencia->save();
+    }
+    public static function EnviarNotificacion($data){
+        return event(new NewMessage($data));
     }
 }

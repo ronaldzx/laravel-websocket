@@ -21,8 +21,9 @@ export default new VueRouter({
         {
             path:'/tabla_incidencia',
             name:'tabla_incidencia',
-            component:Incidencias
-        }
+            hidden: true,
+            component:Incidencias,
+        },
     ],
     base: process.env.BASE_URL,
 })

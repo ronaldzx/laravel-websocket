@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('layouts/app');
 });
+// Route::get('/{any}', 'SpaController@index')->where('any', '.*');
 
 Auth::routes();
 
@@ -25,6 +26,6 @@ Route::get('/obtener-menu','AutenticacionesController@obtenerMenu');
 Route::get('/obtener-incidencias','IncidenciaController@obtenerIncidencia');
 Route::post('/insertar-incidencia','IncidenciaController@insertarIncidencia');
 Route::post('/editar-descripcion','IncidenciaController@editarDescripcion');
-
+Route::get('/RecibirSms','SMSController@recibirSms');
 
 Route::get('/home', 'HomeController@index')->name('home');

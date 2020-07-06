@@ -6,7 +6,7 @@
       v-bind:icono="this.$route.params.icono"
     ></headerContent-component>
     <v-container>
-      <v-data-table :headers="headers" :items="incidencias">
+      <v-data-table :loading="loading" loading-text="Cargando..." :headers="headers" :items="incidencias" v-bind:key="incidencias.id">
         <template v-slot:top>
           <v-toolbar flat color="white">
             <v-toolbar-title>Alerta de incidencia delincuencial</v-toolbar-title>
@@ -34,8 +34,13 @@
         <template v-slot:item.tiempo="{ item }">
           <span>{{formatTime(item.fecha)}}</span>
         </template>
+        <template v-slot:item.mapa="{ item }">
+          <v-btn :href="item.mapa" target="_blank" depressed small>
+            Ver en mapa
+            <v-icon color="orange darken-4" right>mdi-open-in-new</v-icon>
+          </v-btn>
+        </template>
       </v-data-table>
-
       <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
         {{ snackText }}
         <v-btn text @click="snack = false">Close</v-btn>
@@ -63,12 +68,13 @@ export default {
       encrypted: false
     });
     window.Echo.channel("home").listen("NewMessage", e => {
-      console.log(e);
       this.obtenerIncidencias();
     });
   },
   data() {
     return {
+      loading:true,
+      dialog: false,
       snack: false,
       snackColor: "",
       snackText: "",
@@ -77,7 +83,10 @@ export default {
       headers: [
         { text: "N°", value: "id" },
         { text: "Fecha", value: "fecha" },
-        { text: "Dirección", value: "direccion" },
+        { text: "Establecimiento", value: "nombre" },
+        { text: "Telf.", value: "numero" },
+        { text: "Mapa", value: "mapa" },
+        { text: "Propietario", value: "propietario" },
         { text: "Descripción", value: "descripcion" },
         { text: "Hora real de la incidencia", value: "tiempo" }
       ],
@@ -89,13 +98,14 @@ export default {
       return moment(value).format("DD/MM/YYYY");
     },
     formatTime(value) {
-      return moment(value).format("h:mm:ss");
+      return moment(value).format("HH:mm:ss");
     },
     obtenerIncidencias() {
       axios
         .get("/obtener-incidencias")
         .then(response => {
           this.incidencias = response.data;
+          this.loading=false;
         })
         .catch(error => {});
     },
