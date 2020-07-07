@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('layouts/app');
 });
-// Route::get('/{any}', 'SpaController@index')->where('any', '.*');
 
+Route::get('/tabla_incidencia', function () {
+    return redirect('/');
+});
 Auth::routes();
 
 Route::post('/iniciar-sesion','AutenticacionesController@iniciarSesion');
