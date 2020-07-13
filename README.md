@@ -82,14 +82,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 ``
 npm install
 ``
-## Vuetify
-``
-npm install vuetify
-``
-## vue-router
-``
-npm install vue-router
-``
 ## Composer
 ``
 composer install
